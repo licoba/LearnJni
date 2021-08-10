@@ -42,9 +42,9 @@ android {
 //            version '3.18.1'
 //        }
 
-//        ndkBuild {
-//            path file('src/main/jni/Android.mk')
-//        }
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
     }
     buildFeatures {
         viewBinding true
