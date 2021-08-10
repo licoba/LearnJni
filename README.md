@@ -148,7 +148,7 @@ APP_BUILD_SCRIPT := Android.mk
 
 ```
 
-在 build.gradle 里面配置，使用 Android.mk 进行打包
+在 build.gradle 里面配置，使用 Android.mk 文件进行编译
 
 ```
     externalNativeBuild {
@@ -165,3 +165,7 @@ APP_BUILD_SCRIPT := Android.mk
     tv.setText(myJni.getMyHelloString());
     tv.setText(String.valueOf(myJni.add(5,8)) );
 ```
+
+可以看到运行结果，为 5+8 = 13
+
+![Yqhc57pV8aGD9W1](https://i.loli.net/2021/08/10/Yqhc57pV8aGD9W1.jpg)
