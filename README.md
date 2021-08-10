@@ -62,7 +62,7 @@ https://developer.android.com/ndk/guides/build
 
 这样使用 gradle 打包的时候，系统会自动使用 CMake 工具链文件，等同于命令行执行的效果。
 
-## 如何编写 JNI 代码
+## 二、如何编写 JNI 代码
 
 首先明白，JNI 代码是在 C++层的
 
@@ -76,6 +76,8 @@ https://developer.android.com/ndk/guides/build
   ![XVMfrB6IjCPQD7u](https://i.loli.net/2021/08/10/XVMfrB6IjCPQD7u.jpg)
 
 有红色不要紧没问题，因为它现在还找不到对应的 JNI 方法
+
+### 生成.h 头文件
 
 首先在设置页面添加一个 External Tools
 
@@ -95,6 +97,8 @@ https://developer.android.com/ndk/guides/build
 
 生成的头文件在`src/main/jni`目录下
 ![yqxTOJIQGBiCEko](https://i.loli.net/2021/08/10/yqxTOJIQGBiCEko.jpg)
+
+### 实现.cpp 文件
 
 我们先把头文件里面定义的两个函数实现，新建一个同名的 cpp 文件`com_licoba_learnjni_MyJni.cpp`，实现代码：
 
@@ -117,6 +121,8 @@ extern "C" jint JNICALL Java_com_licoba_learnjni_MyJni_add
 这个时候有报错，不要慌，提示这个.h 和.m 文件并不包含在工作目录里面，也就是我们根本就没有用到，我们需要用 Android.mk 和 application.mk 去配置
 ，上面有提到，可以用 `gradle+cmakelist.txt` 或者 `android.mk+application.mk` 两种方式进行配置
 ![RNbVE37pAmP9Kkt](https://i.loli.net/2021/08/10/RNbVE37pAmP9Kkt.jpg)
+
+### 配置 Android.mk 和 Application.mk
 
 在 jni 目录下：
 
@@ -147,6 +153,8 @@ APP_STL := c++_static
 APP_BUILD_SCRIPT := Android.mk
 
 ```
+
+### 最终使用
 
 在 build.gradle 里面配置，使用 Android.mk 文件进行编译
 
