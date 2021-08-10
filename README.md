@@ -177,3 +177,11 @@ APP_BUILD_SCRIPT := Android.mk
 可以看到运行结果，为 5+8 = 13
 
 ![1rGCnpiYSHw48vy](https://i.loli.net/2021/08/10/1rGCnpiYSHw48vy.jpg)
+
+## so 库的打包和使用
+
+cd 到 jni 目录，然后直接执行 ndk-build 命令
+![Es8f2uqtdShyNGU](https://i.loli.net/2021/08/10/Es8f2uqtdShyNGU.jpg)
+
+就会生成 libs 和 obj 文件夹，我们要的 so 库就在 libs 文件夹下
+![ja2hdtmYMOJxNBR](https://i.loli.net/2021/08/10/ja2hdtmYMOJxNBR.jpg)
