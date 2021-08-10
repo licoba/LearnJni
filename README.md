@@ -61,3 +61,107 @@ https://developer.android.com/ndk/guides/build
 ![CisqyWwUG7TBAVz](https://i.loli.net/2021/08/10/CisqyWwUG7TBAVz.jpg)
 
 这样使用 gradle 打包的时候，系统会自动使用 CMake 工具链文件，等同于命令行执行的效果。
+
+## 如何编写 JNI 代码
+
+首先明白，JNI 代码是在 C++层的
+
+大致方法为：Java 层首先定义一个 JNI 的 class，里面都是一些以 native 开头的方法，c++层就是 jni 代码，以很奇怪的名字开头，与 Java 里面定义的方法相对应，这样 Java 就可以调用 c++的方法了
+
+### 定义 Java 接口
+
+为了方便调用，一般都是统一做一个 Java 类，用来调用 native 的方法，这个类作为统一调用入口，在全局内单例使用
+
+- 新建`com.licoba.learnjni.MyJni.java`，然后定义一个 native 方法
+  ![XVMfrB6IjCPQD7u](https://i.loli.net/2021/08/10/XVMfrB6IjCPQD7u.jpg)
+
+有红色不要紧没问题，因为它现在还找不到对应的 JNI 方法
+
+首先在设置页面添加一个 External Tools
+
+- Name: `java`
+- Description: `javah`
+- Program: `javah`
+- Arguments: `-classpath . -jni -d $SourcepathEntry$/../jni $FileClass$`
+- Working directory: `$SourcepathEntry$`
+
+  ![oDZ7FaRyBWO3Tth](https://i.loli.net/2021/08/10/oDZ7FaRyBWO3Tth.jpg)
+
+然后在 com.licoba.learnjni.MyJni.java 上右键
+![xl9TXvGAE6t2Lg5](https://i.loli.net/2021/08/10/xl9TXvGAE6t2Lg5.jpg)
+
+看到控制台打印 就成功了
+![9PjOT1r5MKLVY84](https://i.loli.net/2021/08/10/9PjOT1r5MKLVY84.jpg)
+
+生成的头文件在`src/main/jni`目录下
+![yqxTOJIQGBiCEko](https://i.loli.net/2021/08/10/yqxTOJIQGBiCEko.jpg)
+
+我们先把头文件里面定义的两个函数实现，新建一个同名的 cpp 文件`com_licoba_learnjni_MyJni.cpp`，实现代码：
+
+```
+#include "com_licoba_learnjni_MyJni.h"
+#include <string>
+
+extern "C" jstring JNICALL Java_com_licoba_learnjni_MyJni_getMyHelloString
+(JNIEnv *env, jobject){
+    std::string hello = "I am a test string";
+    return env->NewStringUTF(hello.c_str());
+}
+
+extern "C" jint JNICALL Java_com_licoba_learnjni_MyJni_add
+(JNIEnv *env, jobject, jint a, jint b){
+    return a+b ;
+}
+```
+
+这个时候有报错，不要慌，提示这个.h 和.m 文件并不包含在工作目录里面，也就是我们根本就没有用到，我们需要用 Android.mk 和 application.mk 去配置
+，上面有提到，可以用 `gradle+cmakelist.txt` 或者 `android.mk+application.mk` 两种方式进行配置
+![RNbVE37pAmP9Kkt](https://i.loli.net/2021/08/10/RNbVE37pAmP9Kkt.jpg)
+
+在 jni 目录下：
+
+**新建 Android.mk 文件**
+官方文档
+https://developer.android.com/ndk/guides/android_mk
+
+```
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_MODULE := myjni # 指定lib的名称
+LOCAL_SRC_FILES := com_licoba_learnjni_MyJni.cpp
+include $(BUILD_SHARED_LIBRARY)
+
+```
+
+官方文档
+https://developer.android.com/ndk/guides/application_mk
+
+**新建 Application.mk 文件**
+
+```
+APP_ABI := armeabi-v7a arm64-v8a
+APP_PLATFORM := android-24
+APP_CPPFLAGS := -fPIC -std=c++11
+APP_STL := c++_static
+#APP_STL := c++_shared
+APP_BUILD_SCRIPT := Android.mk
+
+```
+
+在 build.gradle 里面配置，使用 Android.mk 进行打包
+
+```
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
+    }
+```
+
+最后在 MainActivity 里面使用：
+
+```
+    MyJni myJni = new MyJni();
+    tv.setText(myJni.getMyHelloString());
+    tv.setText(String.valueOf(myJni.add(5,8)) );
+```
