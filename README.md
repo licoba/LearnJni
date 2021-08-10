@@ -180,8 +180,40 @@ APP_BUILD_SCRIPT := Android.mk
 
 ## so 库的打包和使用
 
+### 打包
+
 cd 到 jni 目录，然后直接执行 ndk-build 命令
 ![Es8f2uqtdShyNGU](https://i.loli.net/2021/08/10/Es8f2uqtdShyNGU.jpg)
 
 就会生成 libs 和 obj 文件夹，我们要的 so 库就在 libs 文件夹下
 ![ja2hdtmYMOJxNBR](https://i.loli.net/2021/08/10/ja2hdtmYMOJxNBR.jpg)
+
+### 使用
+
+在 app 的 build.gradle 的 android 下直接添加
+
+```
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
+```
+
+然后注释掉 externalNativeBuild 的源代码编译相关部分
+
+```
+
+    externalNativeBuild {
+//        cmake {
+//            path file('src/main/cpp/CMakeLists.txt')
+//            version '3.18.1'
+//        }
+
+//        ndkBuild {
+//            path file('src/main/jni/Android.mk')
+//        }
+    }
+```
+
+这样就和使用源码编译达到同样的效果了，运行 App 可以发现结果一致，如果删掉 v8 文件夹下面的 so 库，运行 app 直接崩溃，说明确实是使用编译出来的 so 文件，而不是源代码。

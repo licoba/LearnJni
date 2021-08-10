@@ -20,6 +20,12 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -36,9 +42,9 @@ android {
 //            version '3.18.1'
 //        }
 
-        ndkBuild {
-            path file('src/main/jni/Android.mk')
-        }
+//        ndkBuild {
+//            path file('src/main/jni/Android.mk')
+//        }
     }
     buildFeatures {
         viewBinding true
