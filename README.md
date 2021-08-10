@@ -175,4 +175,5 @@ APP_BUILD_SCRIPT := Android.mk
 ```
 
 可以看到运行结果，为 5+8 = 13
+
 ![1rGCnpiYSHw48vy](https://i.loli.net/2021/08/10/1rGCnpiYSHw48vy.jpg)
